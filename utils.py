@@ -9,7 +9,7 @@ def groupme_json_to_ics(groupme_json):
     cal.add('prodid', '-//Andrew Mussey//GroupMe-to-ICS 0.1//EN')
     cal.add('calscale', 'GREGORIAN')
     cal.add('method', 'PUBLISH')
-    cal.add('x-wr-calname', 'GroupMe: Athletics Mercado 16u')
+    cal.add('x-wr-calname', 'GroupMe: Athletics Mercado 16U')
     cal.add('x-wr-timezone', 'America/Los_Angeles')
 
     for event in groupme_json.get('response', {}).get('events', []):
