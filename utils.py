@@ -34,8 +34,4 @@ from icalendar import Calendar, Event
    def groupme_json_to_ics(groupme_json):
        cal = Calendar()
        cal.add('version', '2.0')
-       cal.add('prodid', '-//Andrew Mussey//GroupMe-to-ICS 0.1//EN')
-       cal.add('calscale', 'GREGORIAN')
-       cal.add('method', 'PUBLISH')
-       cal.add('x-wr-calname', 'GroupMe: Athletics Mercado 16U')
-       cal.add('x-wr-timezone', 'America/Los_Angeles')
+       cal.add('prodid', '-//Andrew
