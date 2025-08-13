@@ -4,6 +4,7 @@ import pytz
 import uuid
 from flask import current_app
 import requests
+from urllib.parse import quote
 
 def load_groupme_json(app, groupme_api_key, groupme_group_id):
     url_group_info = f'https://api.groupme.com/v3/groups/{groupme_group_id}'
@@ -25,8 +26,8 @@ def load_groupme_json(app, groupme_api_key, groupme_group_id):
         if response.json().get('response', {}).get('name'):
             current_app.groupme_calendar_name = response.json()['response']['name']
             app.logger.info(f'Group name: {current_app.groupme_calendar_name}')
-        else:
-            app.logger.error(f'Group info API failed: {response.status_code}: {response.text}')
+    else:
+        app.logger.error(f'Group info API failed: {response.status_code}: {response.text}')
 
     current_app.groupme_load_successfully = True
     return True
@@ -59,3 +60,9 @@ def groupme_json_to_ics(groupme_json):
         cal.add_component(ical_event)
 
     return cal.to_ical()
+
+def build_ics_urls(ics_url):
+    ics_url_http = ics_url
+    ics_url_webcal = ics_url.replace('https://', 'webcal://')
+    ics_url_google = f'https://calendar.google.com/calendar/r?cid={quote(ics_url_webcal)}'
+    return ics_url_http, ics_url_webcal, ics_url_google
