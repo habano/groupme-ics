@@ -1,5 +1,5 @@
-from icalendar import Calendar, Event, vTimezone, vText
-from datetime import datetime
+from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
+from datetime import datetime, timedelta
 import pytz
 import uuid
 from flask import current_app, Response
@@ -43,9 +43,26 @@ def groupme_json_to_ics(groupme_json):
 
     # Add VTIMEZONE for America/Los_Angeles
     tz = pytz.timezone('America/Los_Angeles')
-    vtimezone = vTimezone()
+    vtimezone = Timezone()
     vtimezone.add('tzid', 'America/Los_Angeles')
     vtimezone.add('x-lic-location', 'America/Los_Angeles')
+
+    # Add STANDARD component
+    standard = TimezoneStandard()
+    standard.add('tzname', 'PST')
+    standard.add('dtstart', datetime(1970, 1, 1, 0, 0, 0))
+    standard.add('tzoffsetfrom', timedelta(hours=-7))
+    standard.add('tzoffsetto', timedelta(hours=-8))
+    vtimezone.add_component(standard)
+
+    # Add DAYLIGHT component
+    daylight = TimezoneDaylight()
+    daylight.add('tzname', 'PDT')
+    daylight.add('dtstart', datetime(1970, 1, 1, 0, 0, 0))
+    daylight.add('tzoffsetfrom', timedelta(hours=-8))
+    daylight.add('tzoffsetto', timedelta(hours=-7))
+    vtimezone.add_component(daylight)
+
     cal.add_component(vtimezone)
 
     for event in groupme_json.get('response', {}).get('events', []):
