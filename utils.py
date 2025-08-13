@@ -2,7 +2,7 @@ from icalendar import Calendar, Event
 from datetime import datetime
 import pytz
 import uuid
-from flask import current_app
+from flask import current_app, Response
 import requests
 from urllib.parse import quote
 
@@ -66,3 +66,29 @@ def build_ics_urls(ics_url):
     ics_url_webcal = ics_url.replace('https://', 'webcal://')
     ics_url_google = f'https://calendar.google.com/calendar/r?cid={quote(ics_url_webcal)}'
     return ics_url_http, ics_url_webcal, ics_url_google
+
+def groupme_ics_error(error_text):
+    cal = Calendar()
+    cal.add('version', '2.0')
+    cal.add('prodid', '-//Andrew Mussey//GroupMe-to-ICS 0.1//EN')
+    cal.add('calscale', 'GREGORIAN')
+    cal.add('method', 'PUBLISH')
+    cal.add('x-wr-calname', 'GroupMe: Error')
+    cal.add('x-wr-timezone', 'America/Los_Angeles')
+
+    ical_event = Event()
+    ical_event.add('summary', 'Error')
+    ical_event.add('uid', str(uuid.uuid4()))
+    ical_event.add('dtstart', datetime.now(pytz.UTC))
+    ical_event.add('dtend', datetime.now(pytz.UTC))
+    ical_event.add('description', f'Error: {error_text}')
+    ical_event.add('last-modified', datetime.now(pytz.UTC))
+    ical_event.add('dtstamp', datetime.now(pytz.UTC))
+    cal.add_component(ical_event)
+
+    return cal.to_ical()
+
+def return_ics_Response(ics_data):
+    if ics_data is None:
+        return groupme_ics_error('No ICS data available')
+    return Response(ics_data, mimetype='text/calendar')
